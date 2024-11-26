@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>校园地图</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* 顶部导航栏样式 */
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 80px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #header img {
+            height: 60px;
+            cursor: pointer;
+        }
+
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* 地图容器样式 */
+        #map-container {
+            height: calc(100vh - 80px); /* 地图占据页面剩余部分 */
+            width: 100%;
+            border-top: 2px solid #0072ff;
+        }
+
+        /* 底部信息样式 */
+        #footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #0072ff;
+            color: white;
+            font-size: 14px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #footer a {
+            color: #ffecb3;
+            text-decoration: none;
+        }
+
+        #footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 地图标记弹窗样式 */
+        .leaflet-popup-content {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaflet-popup-tip {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+	<!--OpenStreetMap 和 Leaflet.js：
+完全免费：无需注册或获取 API 密钥。
+简单易用：轻量级，可轻松添加标记和自定义地图。
+可扩展：支持丰富的插件和高级功能（如绘制路径、显示实时数据等）。
+-->
+    <!-- 顶部导航栏 -->
+    <div id="header">
+        <a href="/">
+            <img src="c43682964e5468b1ef1db0baffdc419.png" alt="Logo" />
+        </a>
+        <div class="menu">
+            <a href="zhuye.html">主页</a>
+            <a href="/map">校园地图</a>
+            <a href="/about">关于我们</a>
+            <a href="/contact">联系我们</a>
+        </div>
+    </div>
+
+    <!-- 地图容器 -->
+    <div id="map-container"></div>
+
+    <!-- 底部 -->
+    <div id="footer">
+        Ajou 校园便利网 © 2024 | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a> 提供支持
+    </div>
+
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 初始化地图
+        const map = L.map('map-container').setView([37.2835, 127.0463], 15); // Ajou University 坐标
+
+        // 加载 OpenStreetMap 瓦片图层
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 添加标记
+        L.marker([37.2835, 127.0463]).addTo(map)
+            .bindPopup('<b>Ajou University</b><br>欢迎访问我们！')
+            .openPopup();
+    </script>
+</body>
+</html>

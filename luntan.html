@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园论坛</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 80px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #header img {
+            height: 60px;
+        }
+
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        #forum {
+            max-width: 1500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #0072ff;
+            margin-bottom: 20px;
+        }
+
+        .post {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 10px 0;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post .author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post .author img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .post h2 {
+            font-size: 18px;
+            color: #333;
+            margin: 0 0 10px;
+        }
+
+        .post p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .post .time {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .post .replies {
+            margin-top: 10px;
+            padding-left: 20px;
+            border-left: 2px solid #0072ff;
+        }
+
+        .post .reply-button {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #0072ff;
+            cursor: pointer;
+        }
+
+        .reply-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        #reply-section, #post-section {
+            margin-top: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #0072ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div id="header">
+        <a href="/">
+            <img src="c43682964e5468b1ef1db0baffdc419.png" alt="Logo" />
+        </a>
+        <div class="menu">
+            <a href="/">主页</a>
+            <a href="/forum">校园论坛</a>
+            <a href="/map">校园地图</a>
+            <a href="/about">关于我们</a>
+        </div>
+    </div>
+
+    <!-- 论坛帖子列表 -->
+    <div id="forum">
+        <h1>校园论坛</h1>
+        <div id="posts">
+            <!-- 帖子内容动态生成 -->
+        </div>
+    </div>
+
+    <!-- 发布新帖区域 -->
+    <div id="post-section">
+        <textarea id="post-title" placeholder="帖子标题..."></textarea>
+        <textarea id="post-content" placeholder="帖子内容..."></textarea>
+        <button id="submit-post">发布新帖</button>
+    </div>
+
+    <script>
+        let currentPostId = null;
+        let postCount = 0;
+        let userCount = 0;  // 用于生成匿名用户编号
+        let replyTarget = null;  // 用于记录回复的目标（发布者或某个回复者）
+
+        // 获取当前时间的函数
+        function getCurrentTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // 发布新帖子
+        document.getElementById('submit-post').addEventListener('click', () => {
+            const title = document.getElementById('post-title').value.trim();
+            const content = document.getElementById('post-content').value.trim();
+            const author = `匿名用户 ${++userCount}`; // 创建匿名用户编号
+            const authorAvatar = "https://www.w3schools.com/w3images/avatar2.png"; // 示例头像
+            const postTime = getCurrentTime(); // 获取发布时间
+
+            if (!title || !content) {
+                alert('帖子标题和内容不能为空！');
+                return;
+            }
+
+            // 创建新帖子元素
+            postCount++;
+            const postId = `post-${postCount}`;
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.id = postId;
+            postElement.innerHTML = `
+                <div class="author">
+                    <img src="${authorAvatar}" alt="${author}" />
+                    <span>${author} (ID: 000${userCount})</span>
+                </div>
+                <h2>${title}</h2>
+                <p>${content}</p>
+                <div class="time">发布时间: ${postTime}</div>
+                <div class="replies" id="replies-${postCount}"></div>
+                <span class="reply-button" data-post-id="${postCount}" data-reply-target="楼主">回复楼主</span>
+                <div class="reply-input" id="reply-input-${postCount}">
+                    <textarea class="reply-textarea" placeholder="写下你的回复..."></textarea>
+                    <button class="submit-reply" data-post-id="${postCount}">提交回复</button>
+                </div>
+            `;
+
+            // 添加到帖子列表
+            document.getElementById('posts').prepend(postElement);
+
+            // 清空输入框
+            document.getElementById('post-title').value = '';
+            document.getElementById('post-content').value = '';
+
+            // 给“回复楼主”按钮绑定事件
+            postElement.querySelector('.reply-button').addEventListener('click', (event) => {
+                const postId = event.target.getAttribute('data-post-id');
+                const replyInput = document.getElementById(`reply-input-${postId}`);
+                replyInput.style.display = replyInput.style.display === 'none' ? 'block' : 'none';
+                replyTarget = postId;  // 记录当前帖子的回复目标为帖子发布者
+                document.querySelector(`#reply-input-${postId} .reply-textarea`).placeholder = `回复：楼主`;
+            });
+
+            // 给“提交回复”按钮绑定事件
+            postElement.querySelector('.submit-reply').addEventListener('click', (event) => {
+                const postId = event.target.getAttribute('data-post-id');
+                const replyText = document.querySelector(`#reply-input-${postId} .reply-textarea`).value.trim();
+                const replyAuthor = `匿名用户 ${++userCount}`;
+                const replyAvatar = "https://www.w3schools.com/w3images/avatar5.png"; 
+                const replyTime = getCurrentTime();
+
+                if (replyText === '') {
+                    alert('回复内容不能为空！');
+                    return;
+                }
+
+                const newReply = document.createElement('div');
+                newReply.classList.add('post');
+                newReply.innerHTML = `
+                    <div class="author">
+                        <img src="${replyAvatar}" alt="${replyAuthor}" />
+                        <span>${replyAuthor} (ID:000${userCount})</span>
+                    </div>
+                    <p>${replyText}</p>
+                    <div class="time">回复时间: ${replyTime}</div>
+                    <span class="reply-button" data-reply-target="${replyAuthor}">回复 ${replyAuthor}</span>
+                `;
+
+                const repliesContainer = document.getElementById(`replies-${postId}`);
+                repliesContainer.appendChild(newReply);
+
+                // 给新回复的“回复”按钮绑定事件
+                newReply.querySelector('.reply-button').addEventListener('click', (event) => {
+                    const replyTarget = event.target.getAttribute('data-reply-target');
+                    const replyInput = document.getElementById(`reply-input-${postId}`);
+                    replyInput.style.display = 'block';
+                    document.querySelector(`#reply-input-${postId} .reply-textarea`).placeholder = `回复：${replyTarget}`;
+                });
+
+                // 清空回复输入框并隐藏回复区域
+                document.querySelector(`#reply-input-${postId} .reply-textarea`).value = '';
+                document.getElementById(`reply-input-${postId}`).style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
